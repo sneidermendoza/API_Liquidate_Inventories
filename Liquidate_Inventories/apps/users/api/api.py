@@ -1,5 +1,5 @@
 from apps.users.models import CustomUser,Role
-from apps.users.api.serializers import  CustomUserSerializer, RoleSerializer,CustomUserListSerializer,RoleListSerializer
+from apps.users.api.serializers import *
 from rest_framework.decorators import api_view
 from rest_framework import status
 from apps.helper.api_response_generic import api_response
@@ -45,7 +45,7 @@ def custom_user_detail_api_view(request,pk):
 def role_api_view(request):
     
     if request.method == 'GET':
-        roles = Role.objects.all()
+        roles = Role.objects.all().values('id','name')
         role_serializer = RoleListSerializer(roles, many = True)
         return api_response(role_serializer.data,'Roles obtenidos correctamente!',status.HTTP_200_OK)
         

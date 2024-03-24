@@ -19,4 +19,4 @@ class Business(BaseModel):
         verbose_name = 'Nombre del Negocio'
 
     def __str__(self):
-        return self.total_profit
+        return self.name_business

@@ -27,7 +27,7 @@ class MeasureUnits(BaseModel):
 class Parameter(BaseModel):
 
     name = models.CharField('nombre', max_length= 50, null = False, unique = True)
-    descriptiom = models.CharField('descripcion', max_length= 50, null = False, unique = True)
+    description = models.CharField('descripcion', max_length= 50, null = False, unique = True)
     historical = HistoricalRecords()
     
     @property
@@ -40,11 +40,11 @@ class Parameter(BaseModel):
         
     
     class Meta:
-        verbose_name = 'Unidad de Medida'
-        verbose_name_plural = 'Unidades de Medidas'
+        verbose_name = 'Parametro'
+        verbose_name_plural = 'Parametros'
 
     def __str__(self):
-        return self.name, self.descriptiom
+        return f"{self.name} - {self.description}"
 
 class Attributes(BaseModel):
 
@@ -62,8 +62,8 @@ class Attributes(BaseModel):
         
     
     class Meta:
-        verbose_name = 'Unidad de Medida'
-        verbose_name_plural = 'Unidades de Medidas'
+        verbose_name = 'Atributo'
+        verbose_name_plural = 'Atributos'
 
     def __str__(self):
         return self.name

@@ -37,6 +37,7 @@ LOCAL_APPS = [
     'apps.inventories',
     'apps.business',
     'apps.generic_tables',
+    'apps.billing',
 ]
 
 

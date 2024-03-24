@@ -26,6 +26,5 @@ class Billings(BaseModel):
         verbose_name_plural = 'Inventarios'
 
     def __str__(self):
-        return self.name
-    
+        return f"{self.inventory} - {self.attribute} - {self.total_profit}"
     

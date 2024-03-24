@@ -24,7 +24,7 @@ class Inventories(BaseModel):
         verbose_name_plural = 'Inventarios'
 
     def __str__(self):
-        return self.name
+        return f"{self.business} - {self.total_cost}"
     
     
 class InventoryDetails(BaseModel):
@@ -48,4 +48,4 @@ class InventoryDetails(BaseModel):
         verbose_name_plural = 'Detalle de Inventarios'
 
     def __str__(self):
-        return self.inventory,self.product
+        return f"{self.inventory} - {self.product} - {self.amount}"

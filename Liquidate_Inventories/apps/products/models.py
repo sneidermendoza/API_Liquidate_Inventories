@@ -27,4 +27,4 @@ class Products(BaseModel):
         verbose_name_plural = 'Productos'
 
     def __str__(self):
-        return self.code,self.name,self.description,self.price
+        return f"{self.code} - {self.name} - {self.description} - {self.measure_units} - {self.price}"
