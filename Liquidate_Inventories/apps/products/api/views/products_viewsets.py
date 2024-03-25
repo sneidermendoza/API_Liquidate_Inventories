@@ -1,4 +1,4 @@
-from rest_framework import generics,status
+from rest_framework import status
 from rest_framework import viewsets
 from apps.products.api.serializers.products_serializer import ProductSerializer
 from apps.helper.api_response_generic import  api_response
