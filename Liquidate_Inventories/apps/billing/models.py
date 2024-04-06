@@ -22,8 +22,8 @@ class Billings(BaseModel):
         
     
     class Meta:
-        verbose_name = 'Inventario'
-        verbose_name_plural = 'Inventarios'
+        verbose_name = 'Facturacion'
+        verbose_name_plural = 'Facturacion'
 
     def __str__(self):
         return f"{self.inventory} - {self.attribute} - {self.total_profit}"

@@ -31,7 +31,8 @@ class InventoryDetails(BaseModel):
     
     inventory = models.ForeignKey(Inventories, on_delete=models.CASCADE)
     product =  models.ForeignKey(Products, on_delete=models.CASCADE)
-    amount =  models.IntegerField("Cantidad del producto", null = False)
+    amount =  models.PositiveIntegerField("Cantidad del producto", null = False)
+    is_valid = models.BooleanField(default=True)
     historical = HistoricalRecords()
     
     @property
