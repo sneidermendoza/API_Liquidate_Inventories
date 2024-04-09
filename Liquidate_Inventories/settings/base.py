@@ -1,9 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
-from django.apps import AppConfig
 import os
-
-AppConfig.default = False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,7 +35,7 @@ BASE_APPS = [
 
 LOCAL_APPS = [
     'apps.users',
-    'apps.base',
+    'apps.bases_sms',
     'apps.products',
     'apps.inventories',
     'apps.business',

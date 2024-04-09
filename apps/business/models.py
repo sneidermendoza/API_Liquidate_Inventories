@@ -1,5 +1,5 @@
 from django.db import models
-from apps.base.models import BaseModel
+from apps.bases_sms.models import BaseModel
 from apps.users.models import CustomUser
 
 class Business(BaseModel):

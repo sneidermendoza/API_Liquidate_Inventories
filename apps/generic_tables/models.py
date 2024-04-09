@@ -1,6 +1,6 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
-from apps.base.models import BaseModel
+from apps.bases_sms.models import BaseModel
 from apps.users.models import Role
 
 class MeasureUnits(BaseModel):
