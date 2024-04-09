@@ -4,7 +4,8 @@ from apps.business.api.serializers.business_serializer import *
 from rest_framework import viewsets
 from rest_framework import status
 from apps.helper.api_response_generic import api_response
-
+from django.db.models import Q
+from unidecode import unidecode
 class  BusinessViewSet(viewsets.GenericViewSet):
     Business = Business
     serializer_class = BusinessSerializer
@@ -17,7 +18,16 @@ class  BusinessViewSet(viewsets.GenericViewSet):
          return self.get_serializer().Meta.model.objects.filter(state = True)
     
     def list(self, request):
-        queryset = self.filter_queryset(self.get_queryset())
+        search = self.request.query_params.get('search')
+        queryset = Business.objects.filter(state = True)
+        if search:
+            search_normalized = unidecode(search).lower()
+            queryset = queryset.filter(
+                Q(name_business__icontains=search_normalized)|
+                Q(user__name__icontains=search)
+                )
+            
+
         serializer = self.get_serializer(queryset, many=True)
         
         if queryset.exists():
