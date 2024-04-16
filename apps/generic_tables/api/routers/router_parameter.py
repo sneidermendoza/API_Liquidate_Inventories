@@ -3,5 +3,5 @@ from apps.generic_tables.api.views.parameter_viewset import ParameterViewSet
 
 
 router = DefaultRouter()
-router.register('', ParameterViewSet, basename='Parametros')
+router.register('parameter', ParameterViewSet, basename='Parametros')
 urlpatterns =  router.urls

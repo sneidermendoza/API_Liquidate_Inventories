@@ -4,6 +4,6 @@ from apps.inventories.api.views.detail_inventory_viewset import InventoryDetails
 
 router = DefaultRouter()
 
-router.register('', InventoryDetailsViewSet, basename= 'detail inventory' )
+router.register('detail_inventory', InventoryDetailsViewSet, basename= 'detail inventory' )
 
 urlpatterns = router.urls

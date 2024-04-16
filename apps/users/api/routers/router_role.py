@@ -4,6 +4,6 @@ from apps.users.api.views.role_viewset import *
 router = DefaultRouter()
 
 
-router.register('', RoleViewSet, basename= 'roles' )
+router.register('roles', RoleViewSet, basename= 'roles' )
 
 urlpatterns = router.urls

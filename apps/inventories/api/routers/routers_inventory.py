@@ -5,6 +5,6 @@ from apps.inventories.api.views.inventory_viewset import *
 router = DefaultRouter()
 
 
-router.register('', InventoriesViewSet, basename= 'inventory' )
+router.register('inventory', InventoriesViewSet, basename= 'inventory' )
 
 urlpatterns = router.urls

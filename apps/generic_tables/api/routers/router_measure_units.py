@@ -3,5 +3,5 @@ from apps.generic_tables.api.views.measure_units_viewset import MeasureUnitsView
 
 
 router = DefaultRouter()
-router.register('', MeasureUnitsViewSet, basename='Unidades de Medida')
+router.register('measure_units', MeasureUnitsViewSet, basename='Unidades de Medida')
 urlpatterns =  router.urls

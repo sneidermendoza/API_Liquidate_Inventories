@@ -3,5 +3,5 @@ from apps.generic_tables.api.views.menus_viewset import MenuViewSet
 
 
 router = DefaultRouter()
-router.register('', MenuViewSet, basename='Menu')
+router.register('menu', MenuViewSet, basename='Menu')
 urlpatterns =  router.urls
