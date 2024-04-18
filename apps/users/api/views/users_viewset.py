@@ -23,29 +23,29 @@ class CustomUserViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(queryset, many=True)
         
         if queryset.exists():
-            return api_response(serializer.data,'Usuarios Obtenidos Exitosamente!',status.HTTP_200_OK)
-        return api_response([],'No se encontraron registros',status.HTTP_404_NOT_FOUND)
+            return api_response(serializer.data,'Usuarios Obtenidos Exitosamente!',status.HTTP_200_OK,None)
+        return api_response([],None,status.HTTP_404_NOT_FOUND,'No se encontraron registros')
         
     
     def create(self, request):
         user_serializer= self.serializer_class(data = request.data)
         if user_serializer.is_valid():
             user_serializer.save()
-            return api_response(user_serializer.data,'Usuarios Creado Exitosamente!', status.HTTP_201_CREATED )
-        return api_response([],user_serializer.errors, status.HTTP_400_BAD_REQUEST )
+            return api_response(user_serializer.data,'Usuarios Creado Exitosamente!', status.HTTP_201_CREATED,None )
+        return api_response([],None, status.HTTP_400_BAD_REQUEST,user_serializer.errors )
     
     def retrieve(self, request, pk=None):
         user = self.get_object(pk)
         user_serializer = self.serializer_class(user)
-        return api_response(user_serializer.data,'Usuario Obtenido Exitosamente!',status.HTTP_200_OK)
+        return api_response(user_serializer.data,'Usuario Obtenido Exitosamente!',status.HTTP_200_OK,None)
     
     def update(self,request, pk=None):
         user = self.get_object(pk)
         user_serializer = UpdateCustomUserSerializer(user, data=request.data)
         if user_serializer.is_valid():
             user_serializer.save()
-            return api_response(user_serializer.data,"Usuario Actualizado Correctamente",status.HTTP_200_OK)           
-        return api_response([],user_serializer.errors,status.HTTP_200_OK)           
+            return api_response(user_serializer.data,"Usuario Actualizado Correctamente",status.HTTP_200_OK,None)           
+        return api_response([],None,status.HTTP_200_OK,user_serializer.errors)           
 
 
 

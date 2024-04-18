@@ -23,34 +23,34 @@ class ParameterViewSet(viewsets.GenericViewSet):
         parameter_serializer = self.get_serializer(queryset, many=True)
         
         if queryset.exists():
-            return api_response(parameter_serializer.data,'parametros Obtenidos Exitosamente!',status.HTTP_200_OK)
-        return api_response([],'No se encontraron registros',status.HTTP_404_NOT_FOUND)
+            return api_response(parameter_serializer.data,'parametros Obtenidos Exitosamente!',status.HTTP_200_OK,None)
+        return api_response([],None,status.HTTP_404_NOT_FOUND,'No se encontraron registros')
         
     
     def create(self, request):
         parameter_serializer= self.serializer_class(data = request.data)
         if parameter_serializer.is_valid():
             parameter_serializer.save()
-            return api_response(parameter_serializer.data,'Parametro Creado Exitosamente!', status.HTTP_201_CREATED )
-        return api_response([],parameter_serializer.errors, status.HTTP_400_BAD_REQUEST )
+            return api_response(parameter_serializer.data,'Parametro Creado Exitosamente!', status.HTTP_201_CREATED ,None)
+        return api_response([],None, status.HTTP_400_BAD_REQUEST,parameter_serializer.errors )
     
     def retrieve(self, request, pk=None):
         parameter = self.get_object(pk)
         parameter_serializer = self.serializer_class(parameter)
-        return api_response(parameter_serializer.data,'Parametro Obtenido Exitosamente!',status.HTTP_200_OK)
+        return api_response(parameter_serializer.data,'Parametro Obtenido Exitosamente!',status.HTTP_200_OK,None)
     
     def update(self,request, pk=None):
         parameter = self.get_object(pk)
         parameter_serializer = self.serializer_class(parameter, data=request.data)
         if parameter_serializer.is_valid():
             parameter_serializer.save()
-            return api_response(parameter_serializer.data,"Parametro Actualizado Correctamente",status.HTTP_200_OK)           
-        return api_response([],parameter_serializer.errors,status.HTTP_200_OK)           
+            return api_response(parameter_serializer.data,"Parametro Actualizado Correctamente",status.HTTP_200_OK,None)           
+        return api_response([],None,status.HTTP_200_OK,parameter_serializer.errors)           
 
 
     def destroy(self, request, pk=None):
         parameter = self.Menu.objects.filter(id = pk).update(state= False)
         if parameter == 1:
-            return api_response([], 'Parametro Eliminado Correctamente',status.HTTP_200_OK)
-        return api_response([], 'El Parametro Que Desea Eliminar No Fue Encontrado',status.HTTP_404_NOT_FOUND)
+            return api_response([], 'Parametro Eliminado Correctamente',status.HTTP_200_OK,None)
+        return api_response([], None,status.HTTP_404_NOT_FOUND,'El Parametro Que Desea Eliminar No Fue Encontrado')
     

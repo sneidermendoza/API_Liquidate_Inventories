@@ -42,26 +42,26 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
                     total_profit=total_profit
                 )
             except Inventories.DoesNotExist:
-                return api_response([], 'El inventario especificado no existe', status.HTTP_404_NOT_FOUND)
+                return api_response([], None, status.HTTP_404_NOT_FOUND,'El Parametro Que Desea Eliminar No Fue Encontrado')
         
-            return api_response(detail_serializer.data, 'Detalles del Inventario Creado con Éxito', status.HTTP_201_CREATED)
+            return api_response(detail_serializer.data, 'Detalles del Inventario Creado con Éxito', status.HTTP_201_CREATED,None)
         else:
-            return api_response([], 'detail_serializer.errors', status.HTTP_400_BAD_REQUEST)
+            return api_response([], None, status.HTTP_400_BAD_REQUEST,detail_serializer.errors)
         
     def list(self, request):
         business_id = request.query_params.get('business_id')
         queryset = self.DetailInventory.objects.filter(inventory__business_id=business_id, state=True)
         if not queryset.exists():
-            return api_response([], 'No se encontraron registros', status.HTTP_404_NOT_FOUND)
+            return api_response([], None, status.HTTP_404_NOT_FOUND,'No se encontraron registros')
         serializer = InventoryDetailListSerializer(queryset, many=True)
-        return api_response(serializer.data, 'Registros Obtenidos con Éxito', status.HTTP_200_OK)
+        return api_response(serializer.data, 'Registros Obtenidos con Éxito', status.HTTP_200_OK,None)
     
     def retrieve(self, request, pk=None):
         queryset = self.DetailInventory.objects.filter(inventory_id=pk, state=True)
         if not queryset.exists():
-            return api_response([], 'No se encontraron registros para el ID de inventario proporcionado', status.HTTP_404_NOT_FOUND)
+            return api_response([], None, status.HTTP_404_NOT_FOUND,'No se encontraron registros para el ID de inventario proporcionado')
         serializer = InventoryDetailListSerializer(queryset, many=True)
-        return api_response(serializer.data, 'Registros de Detalle de Inventario Obtenidos con Éxito', status.HTTP_200_OK)
+        return api_response(serializer.data, 'Registros de Detalle de Inventario Obtenidos con Éxito', status.HTTP_200_OK,None)
     
     def update(self, request, pk=None):
         # Obtener el ID del inventario desde los parámetros de la solicitud
@@ -95,7 +95,7 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
                 response_details.append({'error': f'Registro con ID {detail_id} no encontrado para el inventario con ID {inventory_id}'})
 
         # Devolver la respuesta con los detalles actualizados
-        return api_response(response_details, 'Detalles de inventario actualizados con éxito', status.HTTP_200_OK)
+        return api_response(response_details, 'Detalles de inventario actualizados con éxito', status.HTTP_200_OK,None)
     
     def destroy(self, request, pk=None):
         # Obtener el ID del inventario desde los parámetros de la solicitud
@@ -123,7 +123,7 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
                     # Si el registro no existe, continuar con el siguiente
                     pass
 
-            return api_response([], 'Registros eliminados con éxito', status.HTTP_200_OK)
+            return api_response([], 'Registros eliminados con éxito', status.HTTP_200_OK,None)
         else:
             # No se enviaron datos en el body, lo que significa que se deben eliminar todos los registros del inventario
             try:
@@ -133,6 +133,6 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
                 # Cambiar el estado de todos los registros a inactivo (eliminar lógicamente)
                 queryset.update(state=False)
 
-                return api_response([], 'Todos los registros del inventario eliminados con éxito', status.HTTP_200_OK)
+                return api_response([], 'Todos los registros del inventario eliminados con éxito', status.HTTP_200_OK,None)
             except self.DetailInventory.DoesNotExist:
-                return api_response([], 'No se encontraron registros para el ID de inventario proporcionado', status.HTTP_404_NOT_FOUND)
+                return api_response([], None, status.HTTP_404_NOT_FOUND,'No se encontraron registros para el ID de inventario proporcionado')

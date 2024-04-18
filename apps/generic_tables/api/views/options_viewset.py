@@ -23,34 +23,34 @@ class OptionViewSet(viewsets.GenericViewSet):
         option_serializer = self.get_serializer(queryset, many=True)
         
         if queryset.exists():
-            return api_response(option_serializer.data,'Opcion Obtenidos Exitosamente!',status.HTTP_200_OK)
-        return api_response([],'No se encontraron registros',status.HTTP_404_NOT_FOUND)
+            return api_response(option_serializer.data,'Opcion Obtenidos Exitosamente!',status.HTTP_200_OK,None)
+        return api_response([],None,status.HTTP_404_NOT_FOUND,'No se encontraron registros')
         
     
     def create(self, request):
         option_serializer= self.serializer_class(data = request.data)
         if option_serializer.is_valid():
             option_serializer.save()
-            return api_response(option_serializer.data,'Opcion Creada Exitosamente!', status.HTTP_201_CREATED )
-        return api_response([],option_serializer.errors, status.HTTP_400_BAD_REQUEST )
+            return api_response(option_serializer.data,'Opcion Creada Exitosamente!', status.HTTP_201_CREATED,None )
+        return api_response([],None, status.HTTP_400_BAD_REQUEST,option_serializer.errors )
     
     def retrieve(self, request, pk=None):
         option = self.get_object(pk)
         option_serializer = self.serializer_class(option)
-        return api_response(option_serializer.data,'Opcion Obtenida Exitosamente!',status.HTTP_200_OK)
+        return api_response(option_serializer.data,'Opcion Obtenida Exitosamente!',status.HTTP_200_OK,None)
     
     def update(self,request, pk=None):
         option = self.get_object(pk)
         option_serializer = self.serializer_class(option, data=request.data)
         if option_serializer.is_valid():
             option_serializer.save()
-            return api_response(option_serializer.data,"Opcion Actualizado Correctamente",status.HTTP_200_OK)           
-        return api_response([],option_serializer.errors,status.HTTP_200_OK)           
+            return api_response(option_serializer.data,"Opcion Actualizado Correctamente",status.HTTP_200_OK,None)           
+        return api_response([],None,status.HTTP_200_OK,option_serializer.errors)           
 
 
     def destroy(self, request, pk=None):
         option_destroy = self.Opcion.objects.filter(id = pk).update(state= False)
         if option_destroy == 1:
-            return api_response([], 'Opcion Eliminada Correctamente',status.HTTP_200_OK)
-        return api_response([], 'El Opcion Que Desea Eliminar No Fue Encontrada',status.HTTP_404_NOT_FOUND)
+            return api_response([], 'Opcion Eliminada Correctamente',status.HTTP_200_OK,None)
+        return api_response([], None,status.HTTP_404_NOT_FOUND,'El Opcion Que Desea Eliminar No Fue Encontrada')
     

@@ -31,32 +31,32 @@ class  BusinessViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(queryset, many=True)
         
         if queryset.exists():
-            return api_response(serializer.data,'Negocios Obtenidos Exitosamente!',status.HTTP_200_OK)
-        return api_response([],'No se encontraron registros',status.HTTP_404_NOT_FOUND)
+            return api_response(serializer.data,'Negocios Obtenidos Exitosamente!',status.HTTP_200_OK,None)
+        return api_response([],None,status.HTTP_404_NOT_FOUND,'No se encontraron registros')
     
     def create(self, request):
         business_serializer= self.serializer_class(data = request.data)
         if business_serializer.is_valid():
             business_serializer.save()
-            return api_response(business_serializer.data,'Negocio Creado Exitosamente!', status.HTTP_201_CREATED )
-        return api_response([],business_serializer.errors, status.HTTP_400_BAD_REQUEST )
+            return api_response(business_serializer.data,'Negocio Creado Exitosamente!', status.HTTP_201_CREATED ,None)
+        return api_response([],None, status.HTTP_400_BAD_REQUEST,business_serializer.errors )
     
     def retrieve(self, request, pk=None):
         business = self.get_object(pk)
         business_serializer = self.serializer_class(business)
-        return api_response(business_serializer.data,'Negocio Obtenido Exitosamente!',status.HTTP_200_OK)
+        return api_response(business_serializer.data,'Negocio Obtenido Exitosamente!',status.HTTP_200_OK,None)
     
     def update(self,request, pk=None):
         business = self.get_object(pk)
         business_serializer = UpdateBusinessSerializer(business, data=request.data)
         if business_serializer.is_valid():
             business_serializer.save()
-            return api_response(business_serializer.data,"Negocio Actualizado Correctamente",status.HTTP_200_OK)           
-        return api_response([],business_serializer.errors,status.HTTP_200_OK)           
+            return api_response(business_serializer.data,"Negocio Actualizado Correctamente",status.HTTP_200_OK,None)           
+        return api_response([],None,status.HTTP_200_OK,business_serializer.errors)           
     
     def destroy(self, request, pk=None):
         business_destroy = self.Business.objects.filter(id = pk).update(state= False)
         if business_destroy == 1:
-            return api_response([], 'Usuario Eliminado Correctamente',status.HTTP_200_OK)
-        return api_response([], 'El Usuario Que Desea Eliminar No Fue Encontrado',status.HTTP_404_NOT_FOUND)
+            return api_response([], 'Usuario Eliminado Correctamente',status.HTTP_200_OK,None)
+        return api_response([], None,status.HTTP_404_NOT_FOUND,'El Usuario Que Desea Eliminar No Fue Encontrado')
     

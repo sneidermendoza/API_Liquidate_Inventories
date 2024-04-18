@@ -29,8 +29,8 @@ class Login(TokenObtainPairView):
                     'user' : user_serializer.data,
                     'message': 'Inicio de Sesion Exitoso!'
                 },status=status.HTTP_200_OK)
-            return  api_response([],'Email o Contraseña Incorrecto', status.HTTP_400_BAD_REQUEST)
-        return  api_response([],'Email o Contraseña Incorrecto', status.HTTP_400_BAD_REQUEST)
+            return  api_response([],None, status.HTTP_400_BAD_REQUEST,'Email o Contraseña Incorrecto')
+        return  api_response([],None, status.HTTP_400_BAD_REQUEST,'Email o Contraseña Incorrecto')
     
 
 class Logout(GenericAPIView):
@@ -40,5 +40,5 @@ class Logout(GenericAPIView):
         user = CustomUser.objects.filter(id=request.data.get('user', 0))
         if user.exists:
             RefreshToken.for_user(user.first())
-            return  api_response([],'Sesion Cerrada Correctamente', status.HTTP_200_OK)
-        return  api_response([],'No Existe Este Usuario', status.HTTP_400_BAD_REQUEST)
+            return  api_response([],'Sesion Cerrada Correctamente', status.HTTP_200_OK,None)
+        return  api_response([],None, status.HTTP_400_BAD_REQUEST,'No Existe Este Usuario')
