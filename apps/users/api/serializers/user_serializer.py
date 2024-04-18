@@ -1,24 +1,45 @@
 from rest_framework import serializers
 from apps.users.models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from apps.generic_tables.models import Menus
 
 class CustomTokenOptainPairSerializer(TokenObtainPairSerializer):
     pass
 
 class UserSerializer(serializers.ModelSerializer):
+    # Define el campo adicional para los menús
+    menus = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
-        exclude = ('state', 'created_date', 'modified_date','deleted_date',)
+        exclude = ( 'is_staff', 'created_at', 'status','is_superuser','last_login','password','groups','user_permissions')
+
+    def get_menus(self, instance):
+        # Obtén el rol del usuario
+        user_role = instance.role
+
+        # Si el usuario no tiene un rol, devolver una lista vacía de menús
+        if not user_role:
+            return []
+
+        # Obtén todos los menús asociados al rol del usuario
+        menus = Menus.objects.filter(role=user_role)
+
+        # Serializa los menús y devuelve la representación
+        menus_data = []
+        for menu in menus:
+            menus_data.append({
+                'id': menu.id,
+                'option': menu.option.name,
+            })
+
+        return menus_data
 
     def to_representation(self, instance):
-        return{ 
-            'id' : instance.id,
-            'name' : instance.name,
-            'last_name' : instance.last_name,
-            'email' : instance.email,
-            'role_id' : instance.role_id,
-            'role_name' : instance.role.name,
-        }
+        # Serializa el usuario y sus menús
+        representation = super().to_representation(instance)
+        representation['menus'] = self.get_menus(instance)
+        return representation
         
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
