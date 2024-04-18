@@ -29,8 +29,8 @@ class Login(TokenObtainPairView):
                     'user' : user_serializer.data,
                     'message': 'Inicio de Sesion Exitoso!'
                 },status=status.HTTP_200_OK)
-            return  api_response([],None, status.HTTP_400_BAD_REQUEST,'Email o Contraseña Incorrecto')
-        return  api_response([],None, status.HTTP_400_BAD_REQUEST,'Email o Contraseña Incorrecto')
+            return  api_response([],'Email o Contraseña Incorrecto', status.HTTP_400_BAD_REQUEST,'Email o Contraseña Incorrecto')
+        return  api_response([],'Email o Contraseña Incorrecto', status.HTTP_400_BAD_REQUEST,'Email o Contraseña Incorrecto')
     
 
 class Logout(GenericAPIView):
