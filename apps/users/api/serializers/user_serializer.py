@@ -31,6 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
             menus_data.append({
                 'id': menu.id,
                 'option': menu.option.name,
+                'link': menu.option.link,
             })
 
         return menus_data

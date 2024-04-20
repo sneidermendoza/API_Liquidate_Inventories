@@ -55,21 +55,21 @@ class OptionsSeeder:
         try:
             admin_role = Role.objects.get(name='admin')
             options = [
-                ('opcion', 'gestion de opciones'),
-                ('menu', 'gestion de menu'),
-                ('unidades de medida', 'gestion de unidades de medida'),
-                ('atributos', 'gestion de atributos'),
-                ('parametros', 'gestion de parametros'),
-                ('facturacion', 'gestion de facturacion'),
-                ('inventario', 'gestion de inventario'),
-                ('detalle de inventarios', 'gestion de detalle de inventarios'),
-                ('usuarios', 'gestion de usuarios'),
-                ('negosios', 'gestion de negosios'),
-                ('productos', 'gestion de productos'),
-                ('roles', 'gestion de roles')
+                ('opcion', 'gestion de opciones', 'option/'),
+                ('menu', 'gestion de menu', 'menu/'),
+                ('unidades de medida', 'gestion de unidades de medida', 'measure_units/'),
+                ('atributos', 'gestion de atributos', 'attributes/'),
+                ('parametros', 'gestion de parametros', 'parameters/'),
+                ('facturacion', 'gestion de facturacion', 'billings/'),
+                ('inventario', 'gestion de inventario', 'inventory/'),
+                ('detalle de inventarios', 'gestion de detalle de inventarios', 'detail_inventory/'),
+                ('usuarios', 'gestion de usuarios', 'users/'),
+                ('negosios', 'gestion de negosios', 'business/'),
+                ('productos', 'gestion de productos', 'products/'),
+                ('roles', 'gestion de roles', 'role/')
             ]
-            for name, description in options:
-                option, created = Options.objects.get_or_create(name=name, description=description)
+            for name, description, link in options:
+                option, created = Options.objects.get_or_create(name=name, description=description, link=link)
                 if created:
                     print(f'Opción "{name}" creada correctamente.')
                 else:
