@@ -55,18 +55,18 @@ class OptionsSeeder:
         try:
             admin_role = Role.objects.get(name='admin')
             options = [
-                ('opcion', 'gestion de opciones', 'option/'),
-                ('menu', 'gestion de menu', 'menu/'),
-                ('unidades de medida', 'gestion de unidades de medida', 'measure_units/'),
-                ('atributos', 'gestion de atributos', 'attributes/'),
-                ('parametros', 'gestion de parametros', 'parameters/'),
-                ('facturacion', 'gestion de facturacion', 'billings/'),
-                ('inventario', 'gestion de inventario', 'inventory/'),
-                ('detalle de inventarios', 'gestion de detalle de inventarios', 'detail_inventory/'),
-                ('usuarios', 'gestion de usuarios', 'users/'),
-                ('negosios', 'gestion de negosios', 'business/'),
-                ('productos', 'gestion de productos', 'products/'),
-                ('roles', 'gestion de roles', 'role/')
+                ('opcion', 'gestion de opciones', '/option'),
+                ('menu', 'gestion de menu', '/menu'),
+                ('unidades de medida', 'gestion de unidades de medida', '/measure_units'),
+                ('atributos', 'gestion de atributos', '/attributes'),
+                ('parametros', 'gestion de parametros', '/parameters'),
+                ('facturacion', 'gestion de facturacion', '/billings'),
+                ('inventario', 'gestion de inventario', '/inventory'),
+                ('detalle de inventarios', 'gestion de detalle de inventarios', '/detail_inventory'),
+                ('usuarios', 'gestion de usuarios', '/users'),
+                ('negosios', 'gestion de negosios', '/business'),
+                ('productos', 'gestion de productos', '/products'),
+                ('roles', 'gestion de roles', '/role')
             ]
             for name, description, link in options:
                 option, created = Options.objects.get_or_create(name=name, description=description, link=link)
