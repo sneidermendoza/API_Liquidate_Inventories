@@ -17,7 +17,6 @@ class CustomUserViewSet(viewsets.GenericViewSet):
     def get_queryset(self):
         return self.get_serializer().Meta.model.objects.filter(status = True)
                             
-    
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
@@ -26,7 +25,6 @@ class CustomUserViewSet(viewsets.GenericViewSet):
             return api_response(serializer.data,'Usuarios Obtenidos Exitosamente!',status.HTTP_200_OK,None)
         return api_response([],None,status.HTTP_404_NOT_FOUND,'No se encontraron registros')
         
-    
     def create(self, request):
         user_serializer= self.serializer_class(data = request.data)
         if user_serializer.is_valid():
@@ -47,8 +45,6 @@ class CustomUserViewSet(viewsets.GenericViewSet):
             return api_response(user_serializer.data,"Usuario Actualizado Correctamente",status.HTTP_200_OK,None)           
         return api_response([],None,status.HTTP_200_OK,user_serializer.errors)           
 
-
-
     def destroy(self, request, pk=None):
         user_destroy = self.User.objects.filter(id = pk).update(status= False)
         if user_destroy == 1:
@@ -64,3 +60,4 @@ class CustomUserViewSet(viewsets.GenericViewSet):
             user.save()
             return api_response([],'Contraseña Actualizada Con Exito',status.HTTP_200_OK)
         return api_response([],password_serializer.errors,status.HTTP_400_BAD_REQUEST)
+    
