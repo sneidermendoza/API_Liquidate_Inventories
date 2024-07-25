@@ -11,6 +11,6 @@ class AttributesSerializer(serializers.ModelSerializer):
         return{ 
             'id' : instance.id,
             'name' : instance.name,
-            'parameter_id' : instance.parameter,
+            'parameter_id' : instance.parameter.id,
             'parameter_name' : instance.parameter.name,
         }
