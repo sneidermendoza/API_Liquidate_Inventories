@@ -49,7 +49,7 @@ class ParameterViewSet(viewsets.GenericViewSet):
 
 
     def destroy(self, request, pk=None):
-        parameter = self.Menu.objects.filter(id = pk).update(state= False)
+        parameter = self.Parameter.objects.filter(id = pk).update(state= False)
         if parameter == 1:
             return api_response([], 'Parametro Eliminado Correctamente',status.HTTP_200_OK,None)
         return api_response([], None,status.HTTP_404_NOT_FOUND,'El Parametro Que Desea Eliminar No Fue Encontrado')
