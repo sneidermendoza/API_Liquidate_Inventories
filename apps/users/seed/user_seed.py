@@ -6,14 +6,22 @@ class RoleSeeder:
     @staticmethod
     def seed():
         try:
-            # Crear el rol (Group) si no existe
-            role, created = Role.objects.get_or_create(name='admin')
-            if created:
+            # Crear el rol "admin" si no existe
+            admin_role, admin_created = Role.objects.get_or_create(name='admin')
+            if admin_created:
                 print('Rol "Admin" creado correctamente.')
             else:
                 print('El rol "Admin" ya existe.')
+
+            # Crear el rol "cliente" si no existe
+            client_role, client_created = Role.objects.get_or_create(name='cliente')
+            if client_created:
+                print('Rol "Cliente" creado correctamente.')
+            else:
+                print('El rol "Cliente" ya existe.')
+
         except Exception as e:
-            print(f'Error al crear el rol: {e}')
+            print(f'Error al crear los roles: {e}')
 
 class CustomUserSeeder:
     @staticmethod
