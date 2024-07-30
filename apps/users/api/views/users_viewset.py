@@ -64,3 +64,13 @@ class CustomUserViewSet(viewsets.GenericViewSet):
             user.save()
             return api_response([],'Contraseña Actualizada Con Exito',status.HTTP_200_OK)
         return api_response([],password_serializer.errors,status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['get'])
+    def get_user_business(self, request,pk=None):
+        # Asumiendo que el ID 2 corresponde al rol de "cliente"
+        client_role_id = 2
+        clients = self.get_serializer().Meta.model.objects.filter(role__id=client_role_id, status=True)
+        serializer = self.get_serializer(clients, many=True)
+        if clients.exists():
+            return api_response(serializer.data, 'Clientes Obtenidos Exitosamente!', status.HTTP_200_OK, None)
+        return api_response([], 'No se encontraron clientes', status.HTTP_404_NOT_FOUND, None)
