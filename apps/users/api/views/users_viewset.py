@@ -20,6 +20,10 @@ class CustomUserViewSet(viewsets.GenericViewSet):
     
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         
         if queryset.exists():
