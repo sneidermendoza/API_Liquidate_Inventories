@@ -19,7 +19,7 @@ class  BusinessViewSet(viewsets.GenericViewSet):
     
     def list(self, request):
         search = self.request.query_params.get('search')
-        queryset = Business.objects.filter(state = True)
+        queryset = self.filter_queryset(self.get_queryset().order_by('-created_date'))
         if search:
             search_normalized = unidecode(search).lower()
             queryset = queryset.filter(

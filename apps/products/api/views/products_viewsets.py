@@ -15,7 +15,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             return self.get_serializer().Meta.model.objects.filter(id = pk,state = True).first()
         
     def list(self, request):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.filter_queryset(self.get_queryset().order_by('-created_date'))
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

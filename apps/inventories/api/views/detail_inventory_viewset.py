@@ -50,7 +50,7 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
         
     def list(self, request):
         business_id = request.query_params.get('business_id')
-        queryset = self.DetailInventory.objects.filter(inventory__business_id=business_id, state=True)
+        queryset = self.DetailInventory.objects.filter(inventory__business_id=business_id, state=True).order_by('-created_date')
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = InventoryDetailListSerializer(page, many=True)
