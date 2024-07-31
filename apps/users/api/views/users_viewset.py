@@ -23,13 +23,17 @@ class CustomUserViewSet(viewsets.GenericViewSet):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+            paginated_response = {
+                'count': self.paginator.page.paginator.count,
+                'next': self.paginator.get_next_link(),
+                'previous': self.paginator.get_previous_link(),
+                'results': serializer.data
+            }
+            return api_response(paginated_response, 'Usuarios Obtenidos Exitosamente!', status.HTTP_200_OK, None)
         serializer = self.get_serializer(queryset, many=True)
-        
         if queryset.exists():
-            return api_response(serializer.data,'Usuarios Obtenidos Exitosamente!',status.HTTP_200_OK,None)
-        return api_response([],None,status.HTTP_404_NOT_FOUND,'No se encontraron registros')
-        
+            return api_response(serializer.data, 'Usuarios Obtenidos Exitosamente!', status.HTTP_200_OK, None)
+        return api_response([], None, status.HTTP_404_NOT_FOUND, 'No se encontraron registros')
     
     def create(self, request):
         user_serializer= self.serializer_class(data = request.data)

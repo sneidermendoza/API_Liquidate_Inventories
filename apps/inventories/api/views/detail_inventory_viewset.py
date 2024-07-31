@@ -51,11 +51,21 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
     def list(self, request):
         business_id = request.query_params.get('business_id')
         queryset = self.DetailInventory.objects.filter(inventory__business_id=business_id, state=True)
-        if not queryset.exists():
-            return api_response([], None, status.HTTP_404_NOT_FOUND,'No se encontraron registros')
-        serializer = InventoryDetailListSerializer(queryset, many=True)
-        return api_response(serializer.data, 'Registros Obtenidos con Éxito', status.HTTP_200_OK,None)
-    
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = InventoryDetailListSerializer(page, many=True)
+            paginated_response = {
+                'count': self.paginator.page.paginator.count,
+                'next': self.paginator.get_next_link(),
+                'previous': self.paginator.get_previous_link(),
+                'results': serializer.data
+            }
+            return api_response(paginated_response, 'Registros Obtenidos con Éxito', status.HTTP_200_OK, None)
+        if queryset.exists():
+            serializer = InventoryDetailListSerializer(queryset, many=True)
+            return api_response(serializer.data, 'Registros Obtenidos con Éxito', status.HTTP_200_OK, None)
+        return api_response([], None, status.HTTP_404_NOT_FOUND, 'No se encontraron registros')
+
     def retrieve(self, request, pk=None):
         queryset = self.DetailInventory.objects.filter(inventory_id=pk, state=True)
         if not queryset.exists():

@@ -21,12 +21,21 @@ class MenuViewSet(viewsets.GenericViewSet):
     
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            menu_serializer = self.get_serializer(page, many=True)
+            paginated_response = {
+                'count': self.paginator.page.paginator.count,
+                'next': self.paginator.get_next_link(),
+                'previous': self.paginator.get_previous_link(),
+                'results': menu_serializer.data
+            }
+            return api_response(paginated_response, 'Menus Obtenidos Exitosamente!', status.HTTP_200_OK, None)
         menu_serializer = self.get_serializer(queryset, many=True)
-        
         if queryset.exists():
-            return api_response(menu_serializer.data,'Menus Obtenidos Exitosamente!',status.HTTP_200_OK,None)
-        return api_response([],None,status.HTTP_404_NOT_FOUND,'No se encontraron registros')
-        
+            return api_response(menu_serializer.data, 'Menus Obtenidos Exitosamente!', status.HTTP_200_OK, None)
+        return api_response([], None, status.HTTP_404_NOT_FOUND, 'No se encontraron registros')
+    
     
     def create(self, request):
         menu_serializer= self.serializer_class(data = request.data)

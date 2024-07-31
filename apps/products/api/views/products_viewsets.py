@@ -16,11 +16,20 @@ class ProductViewSet(viewsets.ModelViewSet):
         
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated_response = {
+                'count': self.paginator.page.paginator.count,
+                'next': self.paginator.get_next_link(),
+                'previous': self.paginator.get_previous_link(),
+                'results': serializer.data
+            }
+            return api_response(paginated_response, 'Lista de productos', status.HTTP_200_OK, None)
         if queryset.exists():
-            return api_response(serializer.data,'Lista de productos',status.HTTP_200_OK, None)
-        return api_response([],None,status.HTTP_404_NOT_FOUND,'No se encontraron registros')
+            serializer = self.get_serializer(queryset, many=True)
+            return api_response(serializer.data, 'Lista de productos', status.HTTP_200_OK, None)
+        return api_response([], None, status.HTTP_404_NOT_FOUND, 'No se encontraron registros')
 
     def create(self,request):
         serializer_data = self.serializer_class(data = request.data)

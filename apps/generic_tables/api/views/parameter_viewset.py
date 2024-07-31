@@ -20,12 +20,21 @@ class ParameterViewSet(viewsets.GenericViewSet):
     
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            parameter_serializer = self.get_serializer(page, many=True)
+            paginated_response = {
+                'count': self.paginator.page.paginator.count,
+                'next': self.paginator.get_next_link(),
+                'previous': self.paginator.get_previous_link(),
+                'results': parameter_serializer.data
+            }
+            return api_response(paginated_response, 'parametros Obtenidos Exitosamente!', status.HTTP_200_OK, None)
         parameter_serializer = self.get_serializer(queryset, many=True)
-        
         if queryset.exists():
-            return api_response(parameter_serializer.data,'parametros Obtenidos Exitosamente!',status.HTTP_200_OK,None)
-        return api_response([],None,status.HTTP_404_NOT_FOUND,'No se encontraron registros')
-        
+            return api_response(parameter_serializer.data, 'parametros Obtenidos Exitosamente!', status.HTTP_200_OK, None)
+        return api_response([], None, status.HTTP_404_NOT_FOUND, 'No se encontraron registros')
+
     
     def create(self, request):
         parameter_serializer= self.serializer_class(data = request.data)
