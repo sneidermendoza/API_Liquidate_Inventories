@@ -18,8 +18,8 @@ class  BusinessViewSet(viewsets.GenericViewSet):
          return self.get_serializer().Meta.model.objects.filter(state = True)
     
     def list(self, request):
-        search = self.request.query_params.get('search')
         queryset = self.filter_queryset(self.get_queryset().order_by('-created_date'))
+        search = self.request.query_params.get('search')
         if search:
             search_normalized = unidecode(search).lower()
             queryset = queryset.filter(

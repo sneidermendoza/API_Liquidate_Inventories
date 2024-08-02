@@ -5,6 +5,8 @@ from rest_framework.decorators import action
 from apps.inventories.api.serializers.inventory_serializer import *
 from apps.helper.api_response_generic import api_response
 from apps.inventories.models import Inventories,InventoryDetails
+from unidecode import unidecode
+from django.db.models import Q
 
 class InventoriesViewSet(viewsets.GenericViewSet):
     Inventory = Inventories
@@ -21,6 +23,13 @@ class InventoriesViewSet(viewsets.GenericViewSet):
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset().order_by('-created_date'))
         page = self.paginate_queryset(queryset)
+        search = self.request.query_params.get('search')
+        if search:
+            search_normalized = unidecode(search).lower()
+            queryset = queryset.filter(
+                Q(business_name__icontains=search_normalized)
+                )
+
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             paginated_response = {

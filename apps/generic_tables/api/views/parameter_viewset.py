@@ -5,6 +5,8 @@ from apps.generic_tables.api.serializers.menus_serializer import MenuSerializer
 from apps.generic_tables.models import Parameter
 from apps.helper.api_response_generic import api_response
 from rest_framework import status
+from unidecode import unidecode
+from django.db.models import Q
 
 class ParameterViewSet(viewsets.GenericViewSet):
     serializer_class = ParameterSerializer
@@ -21,6 +23,11 @@ class ParameterViewSet(viewsets.GenericViewSet):
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset().order_by('-created_date'))
         page = self.paginate_queryset(queryset)
+        search = self.request.query_params.get('search')
+        if search:
+            search_normalized = unidecode(search).lower()
+            queryset = queryset.filter(
+                Q(name__icontains=search_normalized))
         if page is not None:
             parameter_serializer = self.get_serializer(page, many=True)
             paginated_response = {

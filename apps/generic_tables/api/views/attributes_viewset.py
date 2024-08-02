@@ -4,6 +4,8 @@ from django.shortcuts import get_object_or_404
 from apps.generic_tables.models import Attributes
 from apps.helper.api_response_generic import api_response
 from rest_framework import status
+from unidecode import unidecode
+from django.db.models import Q
 
 
 class AttributesViewSet(viewsets.GenericViewSet):
@@ -21,6 +23,13 @@ class AttributesViewSet(viewsets.GenericViewSet):
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset().order_by('-created_date'))
         page = self.paginate_queryset(queryset)
+        search = self.request.query_params.get('search')
+        if search:
+            search_normalized = unidecode(search).lower()
+            queryset = queryset.filter(
+                Q(name__icontains=search_normalized)|
+                Q(parameter__name__icontains=search)
+                )
         if page is not None:
             attributes_serializer = self.get_serializer(page, many=True)
             paginated_response = {

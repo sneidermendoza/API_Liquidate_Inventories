@@ -4,6 +4,8 @@ from apps.inventories.api.serializers.detail_inventory_serializer import Invento
 from apps.inventories.models import InventoryDetails, Inventories
 from apps.helper.api_response_generic import api_response
 from apps.billing.models import Billings
+from unidecode import unidecode
+from django.db.models import Q
 
 class InventoryDetailsViewSet(viewsets.GenericViewSet):
     DetailInventory = InventoryDetails
@@ -52,6 +54,13 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
         business_id = request.query_params.get('business_id')
         queryset = self.DetailInventory.objects.filter(inventory__business_id=business_id, state=True).order_by('-created_date')
         page = self.paginate_queryset(queryset)
+        search = self.request.query_params.get('search')
+        if search:
+            search_normalized = unidecode(search).lower()
+            queryset = queryset.filter(
+                Q(business__name__icontains=search_normalized)|
+                Q(product__name__icontains=search)
+                )
         if page is not None:
             serializer = InventoryDetailListSerializer(page, many=True)
             paginated_response = {

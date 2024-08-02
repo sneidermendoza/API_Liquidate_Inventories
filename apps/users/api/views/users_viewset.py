@@ -5,6 +5,8 @@ from rest_framework.decorators import action
 from apps.users.api.serializers.user_serializer import *
 from apps.helper.api_response_generic import api_response
 from apps.users.models import CustomUser
+from unidecode import unidecode
+from django.db.models import Q
 
 class CustomUserViewSet(viewsets.GenericViewSet):
     User = CustomUser
@@ -20,6 +22,16 @@ class CustomUserViewSet(viewsets.GenericViewSet):
     
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset().order_by('-created_at'))
+        search = self.request.query_params.get('search')
+        if search:
+            search_normalized = unidecode(search).lower()
+            queryset = queryset.filter(
+                Q(name__icontains=search_normalized)|
+                Q(last_name__icontains=search)|
+                Q(role__name__icontains=search)|
+                Q(email__icontains=search)
+                )
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
