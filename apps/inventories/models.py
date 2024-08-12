@@ -3,10 +3,12 @@ from simple_history.models import HistoricalRecords
 from apps.bases_sms.models import BaseModel
 from apps.business.models import Business
 from apps.products.models import Products
+from apps.generic_tables.models import Attributes
 
 class Inventories(BaseModel):
 
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    inventory_status = models.ForeignKey(Attributes, on_delete=models.CASCADE)
     total_cost = models.DecimalField('Costo del Inventario', max_digits=20,decimal_places = 2, null = False)
     historical = HistoricalRecords()
     
