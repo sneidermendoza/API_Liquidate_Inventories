@@ -19,7 +19,6 @@ class CustomUserViewSet(viewsets.GenericViewSet):
     def get_queryset(self):
         return self.get_serializer().Meta.model.objects.filter(status = True)
                             
-    
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset().order_by('-created_at'))
         search = self.request.query_params.get('search')
@@ -67,8 +66,6 @@ class CustomUserViewSet(viewsets.GenericViewSet):
             return api_response(user_serializer.data,"Usuario Actualizado Correctamente",status.HTTP_200_OK,None)           
         return api_response([],None,status.HTTP_200_OK,user_serializer.errors)           
 
-
-
     def destroy(self, request, pk=None):
         user_destroy = self.User.objects.filter(id = pk).update(status= False)
         if user_destroy == 1:
@@ -94,3 +91,4 @@ class CustomUserViewSet(viewsets.GenericViewSet):
         if clients.exists():
             return api_response(serializer.data, 'Clientes Obtenidos Exitosamente!', status.HTTP_200_OK, None)
         return api_response([], 'No se encontraron clientes', status.HTTP_404_NOT_FOUND, None)
+    
