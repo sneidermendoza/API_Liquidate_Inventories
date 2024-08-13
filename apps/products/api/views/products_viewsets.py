@@ -22,16 +22,17 @@ class ProductViewSet(viewsets.ModelViewSet):
         
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset().order_by('-created_date'))
-        page = self.paginate_queryset(queryset)
         search = self.request.query_params.get('search')
         if search:
             search_normalized = unidecode(search).lower()
+            print(search_normalized)
             queryset = queryset.filter(
                 Q(name__icontains=search_normalized)|
-                Q(measure_units_name__icontains=search)|
+                Q(measure_units__name__icontains=search)|
                 Q(price__icontains=search)|
                 Q(code__icontains=search)
                 )
+        page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             paginated_response = {
@@ -41,8 +42,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                 'results': serializer.data
             }
             return api_response(paginated_response, 'Lista de productos', status.HTTP_200_OK, None)
+        serializer = self.get_serializer(queryset, many=True)
         if queryset.exists():
-            serializer = self.get_serializer(queryset, many=True)
             return api_response(serializer.data, 'Lista de productos', status.HTTP_200_OK, None)
         return api_response([], None, status.HTTP_404_NOT_FOUND, 'No se encontraron registros')
 
