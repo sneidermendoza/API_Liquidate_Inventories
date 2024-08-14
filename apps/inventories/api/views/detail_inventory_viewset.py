@@ -6,6 +6,7 @@ from apps.helper.api_response_generic import api_response
 from apps.billing.models import Billings
 from unidecode import unidecode
 from django.db.models import Q
+from apps.enum.enum_general import INVENTORY_STATUS_FINALIZED, PENDING_BILLING_STATUS
 
 class InventoryDetailsViewSet(viewsets.GenericViewSet):
     DetailInventory = InventoryDetails
@@ -15,6 +16,12 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
         return self.get_serializer().Meta.model.objects.filter(state = True)
     
     def create(self, request):
+        
+        inventory_id = request.data[0]['inventory']
+        # Verificar si ya existen detalles de inventario para el inventory_id proporcionado
+        if self.DetailInventory.objects.filter(inventory_id=inventory_id).exists():
+            return api_response([], None, status.HTTP_400_BAD_REQUEST, f'El inventario con ID {inventory_id} ya tiene detalles registrados en la base de datos.')
+        
         detail_serializer = self.serializer_class(data=request.data, many=True)
         if detail_serializer.is_valid():
             details = detail_serializer.validated_data
@@ -34,13 +41,14 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
                 # Actualizar el costo del inventario
                 inventory = Inventories.objects.get(id=inventory_id)
                 inventory.total_cost = total_cost
+                inventory.inventory_status = INVENTORY_STATUS_FINALIZED
                 inventory.save()
                 
                 # Crear el registro en la tabla de facturacion
                 total_profit = total_cost * 0.02 
                 billing = Billings.objects.create(
                     inventory=inventory,
-                    attribute_id= 1,
+                    attribute_id= PENDING_BILLING_STATUS,
                     total_profit=total_profit
                 )
             except Inventories.DoesNotExist:

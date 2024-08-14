@@ -42,6 +42,7 @@ LOCAL_APPS = [
     'apps.generic_tables',
     'apps.billing',
     'apps.base',
+    'apps.enum',
 ]
 
 
