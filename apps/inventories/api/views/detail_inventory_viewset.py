@@ -41,14 +41,14 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
                 # Actualizar el costo del inventario
                 inventory = Inventories.objects.get(id=inventory_id)
                 inventory.total_cost = total_cost
-                inventory.inventory_status = INVENTORY_STATUS_FINALIZED
+                inventory.inventory_status_id = INVENTORY_STATUS_FINALIZED
                 inventory.save()
                 
                 # Crear el registro en la tabla de facturacion
                 total_profit = total_cost * 0.02 
                 billing = Billings.objects.create(
                     inventory=inventory,
-                    attribute_id= PENDING_BILLING_STATUS,
+                    attribute_id = PENDING_BILLING_STATUS,
                     total_profit=total_profit
                 )
             except Inventories.DoesNotExist:
