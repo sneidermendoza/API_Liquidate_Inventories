@@ -5,8 +5,9 @@ from apps.inventories.models import InventoryDetails, Inventories
 from apps.helper.api_response_generic import api_response
 from apps.billing.models import Billings
 from unidecode import unidecode
-from django.db.models import Q
-from apps.enum.enum_general import INVENTORY_STATUS_FINALIZED, PENDING_BILLING_STATUS
+from django.db.models import Q, Sum
+from apps.enum.enum_general import INVENTORY_STATUS_FINALIZED, PENDING_BILLING_STATUS, INVENTORY_STATUS_IN_PROCESS
+from apps.helper.export_excel import export_to_excel
 
 class InventoryDetailsViewSet(viewsets.GenericViewSet):
     DetailInventory = InventoryDetails
@@ -16,59 +17,94 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
         return self.get_serializer().Meta.model.objects.filter(state = True)
     
     def create(self, request):
-        
         inventory_id = request.data[0]['inventory']
+        status_inventory = request.data[0]['status_inventory']
+        inventory = Inventories.objects.get(id=inventory_id)
+
         # Verificar si ya existen detalles de inventario para el inventory_id proporcionado
-        if self.DetailInventory.objects.filter(inventory_id=inventory_id).exists():
-            return api_response([], None, status.HTTP_400_BAD_REQUEST, f'El inventario con ID {inventory_id} ya tiene detalles registrados en la base de datos.')
+        if inventory.inventory_status_id == INVENTORY_STATUS_FINALIZED:
+            return api_response([], None, status.HTTP_400_BAD_REQUEST, f'El inventario con ID {inventory_id} ya tiene detalles y esta finalizado.')
         
         detail_serializer = self.serializer_class(data=request.data, many=True)
         if detail_serializer.is_valid():
             details = detail_serializer.validated_data
-            inventory_details = [self.DetailInventory(**detail) for detail in details]
-            self.DetailInventory.objects.bulk_create(inventory_details)
-        
-            # Calcular el costo total del inventario
-            inventory_id = request.data[0]['inventory']  # Suponiendo que el id del inventario está en el primer detalle
+            inventory_details = []
             total_cost = 0
+            
             for detail in details:
                 product = detail['product']
                 quantity = detail['amount']
-                product_price = product.price  # Obtener el precio del producto del objeto
-                total_cost += float(product_price) * quantity  # Asegúrate de que product_price sea un número
-        
+                product_price = product.price  # Obtener el precio del producto
+
+                # Calcular total_in_money para este detalle
+                total_in_money = float(product_price) * quantity
+                # Crear el detalle de inventario incluyendo total_in_money
+                inventory_details.append(self.DetailInventory(
+                    inventory=detail['inventory'],
+                    product=detail['product'],
+                    amount=quantity,
+                    total_in_money=total_in_money
+                ))
+
+            # Guardar todos los detalles en la base de datos
+            self.DetailInventory.objects.bulk_create(inventory_details)
             try:
-                # Actualizar el costo del inventario
-                inventory = Inventories.objects.get(id=inventory_id)
-                inventory.total_cost = total_cost
-                inventory.inventory_status_id = INVENTORY_STATUS_FINALIZED
-                inventory.save()
-                
-                # Crear el registro en la tabla de facturacion
-                total_profit = total_cost * 0.02 
-                billing = Billings.objects.create(
-                    inventory=inventory,
-                    attribute_id = PENDING_BILLING_STATUS,
-                    total_profit=total_profit
-                )
+                # buscamos todos los registros que estan en la tabla detalle de inventario y sumamos todos sus totales en plata
+                total_cost = self.DetailInventory.objects.filter(inventory_id=inventory_id, state=True).aggregate(total=Sum('total_in_money'))['total'] or 0
+                # Actualizar el costo total del inventario
+                if status_inventory == INVENTORY_STATUS_IN_PROCESS:
+                    inventory.inventory_status_id = INVENTORY_STATUS_IN_PROCESS
+                    inventory.total_cost = total_cost
+                    inventory.save()
+                else:
+                    
+                    inventory.total_cost = total_cost
+                    inventory.inventory_status_id = INVENTORY_STATUS_FINALIZED
+                    inventory.save()
+                    
+                    # Crear el registro en la tabla de facturación
+                    total_profit = total_cost * 0.02 
+                    Billings.objects.create(
+                        inventory=inventory,
+                        attribute_id=PENDING_BILLING_STATUS,
+                        total_profit=total_profit
+                    )
+
+                return api_response(detail_serializer.data, 'Detalles del Inventario Creado con Éxito', status.HTTP_201_CREATED, None)
+            
             except Inventories.DoesNotExist:
-                return api_response([], None, status.HTTP_404_NOT_FOUND,'El Parametro Que Desea Eliminar No Fue Encontrado')
-        
-            return api_response(detail_serializer.data, 'Detalles del Inventario Creado con Éxito', status.HTTP_201_CREATED,None)
+                return api_response([], None, status.HTTP_404_NOT_FOUND, 'El Inventario No Fue Encontrado')
+
         else:
-            return api_response([], None, status.HTTP_400_BAD_REQUEST,detail_serializer.errors)
-        
+            return api_response([], None, status.HTTP_400_BAD_REQUEST, detail_serializer.errors)
+
     def list(self, request):
-        business_id = request.query_params.get('business_id')
-        queryset = self.DetailInventory.objects.filter(inventory__business_id=business_id, state=True).order_by('-created_date')
-        page = self.paginate_queryset(queryset)
-        search = self.request.query_params.get('search')
+        inventory_id = request.query_params.get('inventory_id')
+        queryset = self.DetailInventory.objects.filter(inventory_id=inventory_id, state=True).order_by('-created_date')
+        export_to_excel_flag = request.query_params.get('excel', '').lower() == 'true'
+        
+        # Aplicar búsqueda si se proporciona un término de búsqueda
+        search = request.query_params.get('search')
         if search:
             search_normalized = unidecode(search).lower()
             queryset = queryset.filter(
-                Q(business__name__icontains=search_normalized)|
-                Q(product__name__icontains=search)
-                )
+                Q(product__code__icontains=search_normalized) |  # Filtrar por código de producto
+                Q(product__name__icontains=search_normalized)    # Filtrar por nombre de producto
+            )
+        
+        # Si el parámetro `excel=true` está en la solicitud, exportar a Excel
+        if export_to_excel_flag:
+            columns = {
+                'product__code': 'CODIGO DEL PRODUCTO',
+                'product__name': 'NOMBRE DEL PRODUCTO',
+                'product__price': 'PRECIO DEL PRODUCTO',
+                'amount': 'CANTIDAD',
+                'total_in_money': 'TOTAL'
+            }
+            return export_to_excel(queryset, filename='inventory_details.xlsx', columns=columns)
+        
+        # Paginación
+        page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = InventoryDetailListSerializer(page, many=True)
             paginated_response = {
@@ -78,9 +114,13 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
                 'results': serializer.data
             }
             return api_response(paginated_response, 'Registros Obtenidos con Éxito', status.HTTP_200_OK, None)
+
+        # Serializar y devolver datos si existen registros
         if queryset.exists():
             serializer = InventoryDetailListSerializer(queryset, many=True)
             return api_response(serializer.data, 'Registros Obtenidos con Éxito', status.HTTP_200_OK, None)
+
+        # Responder con error si no se encontraron registros
         return api_response([], None, status.HTTP_404_NOT_FOUND, 'No se encontraron registros')
 
     def retrieve(self, request, pk=None):

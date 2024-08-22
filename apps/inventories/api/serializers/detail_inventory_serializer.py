@@ -9,7 +9,7 @@ class InventoryDetailSerializer(serializers.ModelSerializer):
 class InventoryDetailListSerializer(serializers.ModelSerializer):
     class Meta:
         model = InventoryDetails
-        fields = ['id', 'inventory', 'amount']
+        fields = ['id', 'inventory', 'amount', 'total_in_money']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -17,4 +17,6 @@ class InventoryDetailListSerializer(serializers.ModelSerializer):
         representation['business_name'] = instance.inventory.business.name_business
         representation['product_id'] = instance.product.id
         representation['product_name'] = instance.product.name
+        representation['product_price'] = instance.product.price
+        representation['product_code'] = instance.product.code
         return representation

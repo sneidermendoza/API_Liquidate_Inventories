@@ -36,6 +36,7 @@ class InventoryDetails(BaseModel):
     amount =  models.PositiveIntegerField("Cantidad del producto", null = False)
     is_valid = models.BooleanField(default=True)
     historical = HistoricalRecords()
+    total_in_money =  models.PositiveIntegerField("total en dinero, calculodo multiplicando la cantidad del producto por el valor del producto", null = True)
     
     @property
     def _history_user(self):
