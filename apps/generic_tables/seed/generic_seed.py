@@ -2,6 +2,11 @@ from django.core.management.base import BaseCommand
 from django.db import IntegrityError
 from apps.generic_tables.models import MeasureUnits, Parameter, Attributes, Options, Menus
 from apps.users.models import Role
+from django.core.management.base import BaseCommand
+from django.db import IntegrityError
+from apps.generic_tables.models import MeasureUnits, Parameter, Attributes, Options, Menus
+from apps.users.models import Role
+
 
 class MeasureUnitSeeder:
     @classmethod
@@ -23,6 +28,7 @@ class ParameterSeeder:
     def seed(cls):
         try:
             parameter, created = Parameter.objects.get_or_create(name='facturacion', description='parametros de facturacion')
+            parameter, created = Parameter.objects.get_or_create(name='inventario', description='parametros de Inventario')
             if created:
                 print('Parámetro creado correctamente.')
             else:
@@ -34,20 +40,25 @@ class AttributesSeeder:
     @classmethod
     def seed(cls):
         try:
-            parameter, created = Parameter.objects.get_or_create(name='facturacion', description='parametros de facturacion')
-            attributes, created = Attributes.objects.get_or_create(name='cancelado', parameter=parameter)
-            attributes, created = Attributes.objects.get_or_create(name='pendiente', parameter=parameter)
-            if created:
-                print('Atributo creado correctamente.')
-            else:
-                print('El atributo ya existe.')
+            # Obtener o crear el parámetro de facturación
+            billing_parameter, _ = Parameter.objects.get_or_create(name='facturacion', description='parametros de facturacion')
+            
+            # Crear los atributos asociados al parámetro de facturación
+            Attributes.objects.get_or_create(name='cancelado', parameter=billing_parameter)
+            Attributes.objects.get_or_create(name='pendiente', parameter=billing_parameter)
+            
+            # Obtener o crear el parámetro de inventario
+            inventory_parameter, _ = Parameter.objects.get_or_create(name='inventario', description='parametros de Inventario')
+
+            # Crear los atributos asociados al parámetro de inventario
+            Attributes.objects.get_or_create(name='en proceso', parameter=inventory_parameter)
+            Attributes.objects.get_or_create(name='sin empezar', parameter=inventory_parameter)
+            Attributes.objects.get_or_create(name='finalizado', parameter=inventory_parameter)
+            
+            print('Atributos creados correctamente.')
+            
         except IntegrityError as e:
             print(f'Error de base de datos al crear el atributo: {e}')
-
-from django.core.management.base import BaseCommand
-from django.db import IntegrityError
-from apps.generic_tables.models import MeasureUnits, Parameter, Attributes, Options, Menus
-from apps.users.models import Role
 
 class OptionsSeeder:
     @classmethod

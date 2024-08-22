@@ -3,6 +3,7 @@ from apps.generic_tables.seed.generic_seed import ParameterSeeder,AttributesSeed
 from apps.users.seed.user_seed import RoleSeeder,CustomUserSeeder
 class Command(BaseCommand):
     """Exec command $ python manage.py db_seed"""
+    """python manage.py db_seed --class AttributesSeeder"""
     help='Corre los seeders necesarios para el funcionamiento de la aplciación'
 
     def add_arguments(self, parser):
