@@ -76,9 +76,9 @@ class ProductViewSet(viewsets.ModelViewSet):
             return api_response([], None, status.HTTP_404_NOT_FOUND, 'No se proporcionó ningún archivo Excel.')
 
         excel_file = request.FILES['excel_file']
-    
+
         columns_to_read = ['CODIGO', 'NOMBRE DEL PRODUCTO', 'DESCRIPCION', 'PRECIO', 'UNIDAD DE MEDIDA']
-    
+
         # Lee el archivo Excel
         try:
             df = pd.read_excel(excel_file, usecols=columns_to_read)
@@ -96,15 +96,19 @@ class ProductViewSet(viewsets.ModelViewSet):
             'NOMBRE DEL PRODUCTO': 'name',
             'DESCRIPCION': 'description',
             'PRECIO': 'price',
-            'UNIDAD DE MEDIDA': 'measure_units_id',  # Cambia 'measure_units' a 'measure_units_id'
+            'UNIDAD DE MEDIDA': 'measure_units_id',
         }
-    
+
         # Filtrar solo las columnas del DataFrame que necesitas
         df_filtered = df[column_mapping.keys()]
 
         # Renombrar las columnas del DataFrame según el mapeo
         df_filtered = df_filtered.rename(columns=column_mapping)
-    
+
+        # Rellenar los valores nulos en las columnas 'description' y 'code' con cadenas vacías
+        df_filtered['description'] = df_filtered['description'].fillna('')
+        df_filtered['code'] = df_filtered['code'].fillna(0)
+
         # Convertir el DataFrame en una lista de diccionarios
         products_data = df_filtered.to_dict('records')
 
@@ -116,17 +120,14 @@ class ProductViewSet(viewsets.ModelViewSet):
                 measure_units = MeasureUnits.objects.get(id=measure_units_id)
             except MeasureUnits.DoesNotExist:
                 # Maneja el caso en el que no se encuentra el objeto MeasureUnits
-                # Por ejemplo:
                 return api_response([], None, status.HTTP_404_NOT_FOUND, f'No se encontró una unidad de medida con el ID {measure_units_id}')
-                pass
             else:
                 data['measure_units'] = measure_units
-        
+
         # Crear productos en la base de datos utilizando bulk_create
         products_created = Products.objects.bulk_create([Products(**data) for data in products_data])
 
         # Serializar los productos creados
         serializer = ProductSerializer(products_created, many=True)
 
-        return api_response(serializer.data, 'Productos Creados con exito!', status.HTTP_200_OK, None)
-    
+        return api_response(serializer.data, 'Productos Creados con éxito!', status.HTTP_200_OK, None)
