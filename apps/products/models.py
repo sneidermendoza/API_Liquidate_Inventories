@@ -6,9 +6,9 @@ from apps.generic_tables.models import MeasureUnits
 
 class Products(BaseModel):
     
-    code = models.IntegerField(("Codigo del Producto"), null = True )
+    code = models.BigIntegerField(("Codigo del Producto"), null = True )
     name = models.CharField('Nombre del producto', max_length= 150, null = False, unique = True)
-    description = models.CharField('Descripcion', max_length= 250, null = True)
+    description = models.CharField('Descripcion', max_length= 250, null = True, blank=True,)
     price = models.DecimalField(("Precio del Producto"), max_digits=20,decimal_places=2)
     measure_units = models.ForeignKey(MeasureUnits, on_delete=models.CASCADE)
     historical = HistoricalRecords()
