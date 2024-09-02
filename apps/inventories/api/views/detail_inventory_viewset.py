@@ -101,7 +101,10 @@ class InventoryDetailsViewSet(viewsets.GenericViewSet):
                 'amount': 'CANTIDAD',
                 'total_in_money': 'TOTAL'
             }
-            return export_to_excel(queryset, filename='inventory_details.xlsx', columns=columns)
+            # Calcular el total_cost desde la tabla de Inventory relacionada
+            total_cost = queryset.aggregate(total_cost=InventoryDetails.Sum('total_in_money'))['total_cost'] or 0
+        
+            return export_to_excel(queryset, filename='inventory_details.xlsx', columns=columns, total_cost=total_cost)
         
         # Paginación
         page = self.paginate_queryset(queryset)
