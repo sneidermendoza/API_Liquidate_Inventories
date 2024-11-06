@@ -20,7 +20,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 DATABASES = {
     'default': dj_database_url.config(
         # default='sqlite:///db.sqlite3',
-        default='postgresql://sms:m5rCXr2CMFue6mtU8jEAFHcEPrWliLqF@dpg-cr67v3ij1k6c739d6je0-a.oregon-postgres.render.com/inventorydb_wyg0',
+        default='postgresql://inventory_bd_user:YYfSAzXSeU6AooF8XyQjpghDALPHRiHJ@dpg-cslciljtq21c73eglb0g-a.oregon-postgres.render.com/inventory_bd',
         conn_max_age=600
     )
 }
